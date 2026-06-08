@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +5,86 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum TagColor {
+  RED
+  ORANGE
+  AMBER
+  YELLOW
+  LIME
+  GREEN
+  EMERALD
+  TEAL
+  CYAN
+  SKY
+  BLUE
+  INDIGO
+  VIOLET
+  PURPLE
+  FUCHSIA
+  PINK
+  ROSE
+}
+
+model User {
+  id        String           @id @default(uuid())
+  name      String
+  email     String           @unique
+  passwordHash String         @map("password_hash")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  entries JournalEntry[]
+  tags    Tag[]
+
+  @@map("users")
+}
+
+model JournalEntry {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  title     String
+  content   String
+  entryDate DateTime @map("entry_date") @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  entryTags EntryTag[]
+
+  @@index([userId])
+  @@index([entryDate])
+  @@index([userId, entryDate])
+  @@index([createdAt])
+  @@map("journal_entries")
+}
+
+model Tag {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  name      String
+  color     TagColor?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  entryTags EntryTag[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("tags")
+}
+
+model EntryTag {
+  entryId String @map("entry_id")
+  tagId   String @map("tag_id")
+
+  journalEntry JournalEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  tag          Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([entryId, tagId])
+  @@index([tagId])
+  @@map("entry_tags")
 }
