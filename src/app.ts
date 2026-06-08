@@ -10,6 +10,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { deserializeUser } from './shared/middlewares/deserialize-user.js';
 import { authRouter } from './features/auth/auth.router.js';
+import { entryRouter } from './features/journal-entries/entry.router.js';
 
 const PgSession = connectPgSimple(session);
 
@@ -46,6 +47,7 @@ app.use(deserializeUser);
 
 // NOTE: Routes
 app.use('/auth', authRouter);
+app.use('/entries', entryRouter);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({

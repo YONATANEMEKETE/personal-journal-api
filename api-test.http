@@ -129,3 +129,63 @@ POST {{baseUrl}}/auth/logout
 
 ### Logout — unauthenticated (no session cookie, or after logout clears it)
 POST {{baseUrl}}/auth/logout
+
+### Create Entry — success (run login first to establish session)
+POST {{baseUrl}}/entries
+Content-Type: application/json
+
+{
+  "title": "My First Entry",
+  "content": "Today was a great day. I learned a lot about backend development.",
+  "entryDate": "2026-06-08"
+}
+
+### Create Entry — duplicate title (run after the success case)
+POST {{baseUrl}}/entries
+Content-Type: application/json
+
+{
+  "title": "My First Entry",
+  "content": "This should conflict.",
+  "entryDate": "2026-06-08"
+}
+
+### Create Entry — missing title
+POST {{baseUrl}}/entries
+Content-Type: application/json
+
+{
+  "content": "Some content",
+  "entryDate": "2026-06-08"
+}
+
+### Create Entry — invalid entryDate format
+POST {{baseUrl}}/entries
+Content-Type: application/json
+
+{
+  "title": "Test",
+  "content": "Content here",
+  "entryDate": "not-a-date"
+}
+
+### Create Entry — with tags (run login + create tags first)
+POST {{baseUrl}}/entries
+Content-Type: application/json
+
+{
+  "title": "Entry With Tags",
+  "content": "This entry has mood tags attached.",
+  "entryDate": "2026-06-08",
+  "tagIds": ["replace-with-actual-tag-uuid"]
+}
+
+### Create Entry — unauthenticated (no session cookie)
+POST {{baseUrl}}/entries
+Content-Type: application/json
+
+{
+  "title": "Should Not Create",
+  "content": "This should fail with 401.",
+  "entryDate": "2026-06-08"
+}
