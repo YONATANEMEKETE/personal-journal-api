@@ -42,6 +42,13 @@ class EntryTagService {
       throw notFound('Tag not found');
     }
 
+    const existing = await prisma.entryTag.findUnique({
+      where: { entryId_tagId: { entryId, tagId } },
+    });
+    if (!existing) {
+      throw notFound('Tag not assigned to this entry');
+    }
+
     await entryTagRepository.removeTag(entryId, tagId);
   }
 }

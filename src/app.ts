@@ -2,7 +2,6 @@ import express from 'express';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import { requestLogger } from './shared/middlewares/request-logger.js';
-import { notFound } from './shared/errors/error.js';
 import { errorHandler } from './shared/middlewares/error-handler.js';
 import { configs } from './shared/configs/env.js';
 import { sessionPool } from './shared/db/session-pool.js';
@@ -12,6 +11,7 @@ import { deserializeUser } from './shared/middlewares/deserialize-user.js';
 import { authRouter } from './features/auth/auth.router.js';
 import { entryRouter } from './features/journal-entries/entry.router.js';
 import { tagsRouter } from './features/tags/tags.router.js';
+import { notFoundHandler } from './shared/middlewares/not-found.js';
 
 const PgSession = connectPgSimple(session);
 
@@ -57,5 +57,5 @@ app.get('/health', (_req, res) => {
   });
 });
 
-app.use(notFound);
+app.use(notFoundHandler);
 app.use(errorHandler);

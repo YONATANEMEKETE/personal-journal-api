@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { entryService } from './entry.service.js';
 import { sendSuccessResponse } from '../../shared/utils/response.js';
+import type { ListEntriesQuery } from './entry.schema.js';
 
 export class EntryController {
   async create(req: Request, res: Response, next: NextFunction) {
@@ -58,7 +59,7 @@ export class EntryController {
 
   async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const query = req.query as any;
+      const query = req.query as unknown as ListEntriesQuery;
       const result = await entryService.listEntries(req.user!.id, query);
 
       req.log.info({ page: query.page, limit: query.limit }, 'entries listed');

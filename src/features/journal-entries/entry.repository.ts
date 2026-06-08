@@ -10,7 +10,12 @@ class EntryRepository {
   }
 
   async findByTitle(title: string, userId: string) {
-    return prisma.journalEntry.findFirst({ where: { title, userId } });
+    return prisma.journalEntry.findFirst({
+      where: {
+        title: { equals: title, mode: 'insensitive' },
+        userId,
+      },
+    });
   }
 
   async findById(id: string) {
