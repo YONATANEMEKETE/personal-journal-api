@@ -96,7 +96,7 @@
 			"typeName": "camera"
 		},
 		{
-			"editingShapeId": null,
+			"editingShapeId": "shape:4fWKIUjMQgAhIxZMRmzt_",
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:4fWKIUjMQgAhIxZMRmzt_"
@@ -145,7 +145,7 @@
 			"screenBounds": {
 				"x": 0,
 				"y": 0,
-				"w": 1374.3359375,
+				"w": 1319.0399169921875,
 				"h": 1049.471923828125
 			},
 			"insets": [
@@ -163,7 +163,7 @@
 			"isFocused": true,
 			"devicePixelRatio": 0.8680555820465088,
 			"isCoarsePointer": false,
-			"isHoveringCanvas": true,
+			"isHoveringCanvas": false,
 			"openMenus": [],
 			"isChangingStyle": false,
 			"isReadonly": false,
@@ -291,11 +291,23 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "make sure the app spins up"
+													"text": "make sure the app spins up "
 												}
 											]
 										}
 									]
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "   Done ✅ "
 								}
 							]
 						},
