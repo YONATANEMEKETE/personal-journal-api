@@ -41,6 +41,20 @@ export class TagsController {
       next(error);
     }
   }
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tagId = req.params.tagId as string;
+      const data = req.body;
+      const tag = await tagsService.updateTag(tagId, data, req.user!.id);
+
+      req.log.info({ tagId: tag.id }, 'tag updated');
+
+      sendSuccessResponse(res, 200, tag);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const tagsController = new TagsController();

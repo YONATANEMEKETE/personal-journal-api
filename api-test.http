@@ -331,3 +331,44 @@ GET {{baseUrl}}/tags/not-a-uuid
 
 ### Get Tag — unauthenticated (no session cookie)
 GET {{baseUrl}}/tags/00000000-0000-0000-0000-000000000000
+
+### Update Tag — success (replace with actual tag UUID, run login first)
+PATCH {{baseUrl}}/tags/replace-with-actual-tag-uuid
+Content-Type: application/json
+
+{
+  "name": "updated-tag-name",
+  "color": "BLUE"
+}
+
+### Update Tag — update name only
+PATCH {{baseUrl}}/tags/replace-with-actual-tag-uuid
+Content-Type: application/json
+
+{
+  "name": "renamed-tag"
+}
+
+### Update Tag — not found (valid UUID, no tag)
+PATCH {{baseUrl}}/tags/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "name": "ghost-tag"
+}
+
+### Update Tag — empty name
+PATCH {{baseUrl}}/tags/replace-with-actual-tag-uuid
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+### Update Tag — invalid color enum
+PATCH {{baseUrl}}/tags/replace-with-actual-tag-uuid
+Content-Type: application/json
+
+{
+  "color": "INVALID"
+}
