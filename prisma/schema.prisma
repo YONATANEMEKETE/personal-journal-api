@@ -77,6 +77,14 @@ model Tag {
   @@map("tags")
 }
 
+model Session {
+  sid    String   @id
+  sess   Json
+  expire DateTime
+
+  @@map("user_sessions")
+}
+
 model EntryTag {
   entryId String @map("entry_id")
   tagId   String @map("tag_id")
