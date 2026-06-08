@@ -6,4 +6,9 @@ export const createTagSchema = z.object({
   color: z.nativeEnum(TagColor).optional(),
 });
 
+export const listTagsQuerySchema = z.object({
+  includeEntryCount: z.coerce.boolean().optional().default(false),
+});
+
 export type CreateTagInput = z.infer<typeof createTagSchema>;
+export type ListTagsQuery = z.infer<typeof listTagsQuerySchema>;

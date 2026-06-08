@@ -1,6 +1,6 @@
 import { tagsRepository } from './tags.repository.js';
 import { conflict } from '../../shared/errors/error.js';
-import type { CreateTagInput } from './tags.schema.js';
+import type { CreateTagInput, ListTagsQuery } from './tags.schema.js';
 
 class TagsService {
   async create(data: CreateTagInput, userId: string) {
@@ -16,6 +16,10 @@ class TagsService {
     });
 
     return tag;
+  }
+
+  async listTags(userId: string, query: ListTagsQuery) {
+    return tagsRepository.findAll(userId, query.includeEntryCount);
   }
 }
 

@@ -310,3 +310,12 @@ Content-Type: application/json
 {
   "name": "should-fail"
 }
+
+### List Tags — success (run login first)
+GET {{baseUrl}}/tags
+
+### List Tags — with entry count
+GET {{baseUrl}}/tags?includeEntryCount=true
+
+### List Tags — unauthenticated (no session cookie)
+GET {{baseUrl}}/tags

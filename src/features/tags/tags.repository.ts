@@ -13,6 +13,15 @@ class TagsRepository {
   async findByName(userId: string, name: string) {
     return prisma.tag.findFirst({ where: { userId, name } });
   }
+
+  async findAll(userId: string, includeEntryCount: boolean) {
+    return prisma.tag.findMany({
+      where: { userId },
+      include: includeEntryCount
+        ? { _count: { select: { entryTags: true } } }
+        : undefined,
+    });
+  }
 }
 
 export const tagsRepository = new TagsRepository();
