@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { validate } from '../../shared/middlewares/validate.js';
+import { requireAuth } from '../../shared/middlewares/require-auth.js';
 import { registerSchema, loginSchema } from './auth.schema.js';
 import { authController } from './auth.controller.js';
 
@@ -10,5 +11,6 @@ authRouter.post(
   validate(registerSchema, 'body'),
   authController.register,
 );
-// Login
 authRouter.post('/login', validate(loginSchema, 'body'), authController.login);
+authRouter.post('/logout', requireAuth, authController.logout);
+authRouter.get('/me', requireAuth, authController.me);

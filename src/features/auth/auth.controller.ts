@@ -30,6 +30,28 @@ export class AuthController {
       next(error);
     }
   }
+
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      req.session.destroy((err) => {
+        if (err) {
+          return next(err);
+        }
+        res.clearCookie('connect.sid');
+        res.status(204).send();
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async me(req: Request, res: Response, next: NextFunction) {
+    try {
+      sendSuccessResponse(res, 200, req.user!);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const authController = new AuthController();

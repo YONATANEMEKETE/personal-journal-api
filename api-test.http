@@ -117,3 +117,15 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {}
+
+### Me — success (run login success first to establish session)
+GET {{baseUrl}}/auth/me
+
+### Me — unauthenticated (no session cookie)
+GET {{baseUrl}}/auth/me
+
+### Logout — success (run login success first to establish session)
+POST {{baseUrl}}/auth/logout
+
+### Logout — unauthenticated (no session cookie, or after logout clears it)
+POST {{baseUrl}}/auth/logout
