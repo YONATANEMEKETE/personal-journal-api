@@ -16,6 +16,20 @@ export class EntryTagController {
       next(error);
     }
   }
+
+  async removeTag(req: Request, res: Response, next: NextFunction) {
+    try {
+      const entryId = req.params.entryId as string;
+      const tagId = req.params.tagId as string;
+      await entryTagService.removeTag(entryId, tagId, req.user!.id);
+
+      req.log.info({ entryId, tagId }, 'tag removed from entry');
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const entryTagController = new EntryTagController();

@@ -422,3 +422,18 @@ Content-Type: application/json
 {
   "tagIds": ["not-a-uuid"]
 }
+
+### Remove Tag from Entry — success (replace with actual entry UUID and tag UUID)
+DELETE {{baseUrl}}/entries/replace-with-actual-entry-uuid/tags/replace-with-actual-tag-uuid
+
+### Remove Tag — entry not found
+DELETE {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000/tags/00000000-0000-0000-0000-000000000000
+
+### Remove Tag — tag not found (valid UUIDs but no relationship)
+DELETE {{baseUrl}}/entries/replace-with-actual-entry-uuid/tags/00000000-0000-0000-0000-000000000000
+
+### Remove Tag — invalid entryId format
+DELETE {{baseUrl}}/entries/not-a-uuid/tags/00000000-0000-0000-0000-000000000000
+
+### Remove Tag — invalid tagId format
+DELETE {{baseUrl}}/entries/replace-with-actual-entry-uuid/tags/not-a-uuid

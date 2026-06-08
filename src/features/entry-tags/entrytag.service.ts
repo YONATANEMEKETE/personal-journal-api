@@ -30,6 +30,20 @@ class EntryTagService {
       });
     });
   }
+
+  async removeTag(entryId: string, tagId: string, userId: string) {
+    const entry = await entryRepository.findById(entryId);
+    if (!entry || entry.userId !== userId) {
+      throw notFound('Entry not found');
+    }
+
+    const tag = await tagsRepository.findById(tagId);
+    if (!tag || tag.userId !== userId) {
+      throw notFound('Tag not found');
+    }
+
+    await entryTagRepository.removeTag(entryId, tagId);
+  }
 }
 
 export const entryTagService = new EntryTagService();
