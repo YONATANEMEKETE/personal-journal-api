@@ -1,13 +1,6 @@
-type UserWithPassword = {
-  id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import type { User } from '../../generated/prisma/client.js';
 
-export function sanitizeUser(user: UserWithPassword) {
+export function sanitizeUser(user: User) {
   const { passwordHash, ...safeUser } = user;
   return safeUser;
 }
