@@ -8,6 +8,7 @@ import { configs } from './shared/configs/env.js';
 import { sessionPool } from './shared/db/session-pool.js';
 import helmet from 'helmet';
 import cors from 'cors';
+import { deserializeUser } from './shared/middlewares/deserialize-user.js';
 
 const PgSession = connectPgSimple(session);
 
@@ -22,7 +23,6 @@ app.use(
     credentials: true,
   }),
 );
-
 app.use(
   session({
     store: new PgSession({
@@ -41,6 +41,7 @@ app.use(
     },
   }),
 );
+app.use(deserializeUser);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({
