@@ -262,3 +262,51 @@ GET {{baseUrl}}/entries?sortBy=invalidColumn
 
 ### List Entries — limit exceeds max (should clamp to 100)
 GET {{baseUrl}}/entries?limit=999
+
+### Create Tag — success (run login first to establish session)
+POST {{baseUrl}}/tags
+Content-Type: application/json
+
+{
+  "name": "grateful",
+  "color": "AMBER"
+}
+
+### Create Tag — default color (without color field)
+POST {{baseUrl}}/tags
+Content-Type: application/json
+
+{
+  "name": "productive"
+}
+
+### Create Tag — duplicate name (run after the success case)
+POST {{baseUrl}}/tags
+Content-Type: application/json
+
+{
+  "name": "grateful"
+}
+
+### Create Tag — missing name
+POST {{baseUrl}}/tags
+Content-Type: application/json
+
+{}
+
+### Create Tag — invalid color enum value
+POST {{baseUrl}}/tags
+Content-Type: application/json
+
+{
+  "name": "test",
+  "color": "INVALID_COLOR"
+}
+
+### Create Tag — unauthenticated (no session cookie)
+POST {{baseUrl}}/tags
+Content-Type: application/json
+
+{
+  "name": "should-fail"
+}

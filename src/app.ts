@@ -11,6 +11,7 @@ import cors from 'cors';
 import { deserializeUser } from './shared/middlewares/deserialize-user.js';
 import { authRouter } from './features/auth/auth.router.js';
 import { entryRouter } from './features/journal-entries/entry.router.js';
+import { tagsRouter } from './features/tags/tags.router.js';
 
 const PgSession = connectPgSimple(session);
 
@@ -48,6 +49,7 @@ app.use(deserializeUser);
 // NOTE: Routes
 app.use('/auth', authRouter);
 app.use('/entries', entryRouter);
+app.use('/tags', tagsRouter);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({
