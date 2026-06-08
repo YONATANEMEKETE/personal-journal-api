@@ -67,3 +67,53 @@ Content-Type: application/json
   "email": "Charlie@Example.com",
   "password": "securePass1"
 }
+
+### NOTE: Login — success (use Alice credentials)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@example.com",
+  "password": "password123"
+}
+
+### Login — wrong password
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@example.com",
+  "password": "wrongpassword"
+}
+
+### Login — non-existent email
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "nobody@example.com",
+  "password": "password123"
+}
+
+### Login — missing password
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@example.com"
+}
+
+### Login — invalid email format
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "password123"
+}
+
+### Login — empty body
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{}
