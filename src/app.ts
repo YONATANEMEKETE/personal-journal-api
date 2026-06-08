@@ -9,6 +9,7 @@ import { sessionPool } from './shared/db/session-pool.js';
 import helmet from 'helmet';
 import cors from 'cors';
 import { deserializeUser } from './shared/middlewares/deserialize-user.js';
+import { authRouter } from './features/auth/auth.router.js';
 
 const PgSession = connectPgSimple(session);
 
@@ -42,6 +43,9 @@ app.use(
   }),
 );
 app.use(deserializeUser);
+
+// NOTE: Routes
+app.use('/auth', authRouter);
 
 app.get('/health', (_req, res) => {
   res.status(200).json({
