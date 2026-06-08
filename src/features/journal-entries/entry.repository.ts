@@ -12,6 +12,10 @@ class EntryRepository {
   async findByTitle(title: string, userId: string) {
     return prisma.journalEntry.findFirst({ where: { title, userId } });
   }
+
+  async findById(id: string) {
+    return prisma.journalEntry.findUnique({ where: { id } });
+  }
 }
 
 export const entryRepository = new EntryRepository();

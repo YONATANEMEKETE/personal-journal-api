@@ -46,6 +46,14 @@ class EntryService {
       entryRepository.create(baseData, tx),
     );
   }
+
+  async getEntry(entryId: string, userId: string) {
+    const entry = await entryRepository.findById(entryId);
+    if (!entry || entry.userId !== userId) {
+      throw notFound('Entry not found');
+    }
+    return entry;
+  }
 }
 
 export const entryService = new EntryService();

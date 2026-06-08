@@ -7,4 +7,9 @@ export const createEntrySchema = z.object({
   tagIds: z.array(z.string().uuid('Invalid tag ID')).optional(),
 });
 
+export const entryIdParamsSchema = z.object({
+  entryId: z.string().uuid('Invalid entry ID'),
+});
+
 export type CreateEntryInput = z.infer<typeof createEntrySchema>;
+export type EntryIdParams = z.infer<typeof entryIdParamsSchema>;

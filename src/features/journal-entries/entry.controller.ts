@@ -15,6 +15,19 @@ export class EntryController {
       next(error);
     }
   }
+
+  async getEntry(req: Request, res: Response, next: NextFunction) {
+    try {
+      const entryId = req.params.entryId as string;
+      const entry = await entryService.getEntry(entryId, req.user!.id);
+
+      req.log.info({ entryId: entry.id }, 'entry retrieved');
+
+      sendSuccessResponse(res, 200, entry);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const entryController = new EntryController();

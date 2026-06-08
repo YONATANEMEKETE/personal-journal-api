@@ -189,3 +189,12 @@ Content-Type: application/json
   "content": "This should fail with 401.",
   "entryDate": "2026-06-08"
 }
+
+### Get Entry — success (replace with actual entry ID)
+GET {{baseUrl}}/entries/replace-with-actual-entry-uuid
+
+### Get Entry — not found (valid UUID but no entry)
+GET {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000
+
+### Get Entry — invalid entryId format (not a UUID)
+GET {{baseUrl}}/entries/not-a-uuid
