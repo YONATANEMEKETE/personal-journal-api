@@ -1,7 +1,7 @@
 import { prisma } from '../../shared/db/prisma.js';
 import { entryRepository } from './entry.repository.js';
 import { conflict, notFound } from '../../shared/errors/error.js';
-import type { CreateEntryInput, UpdateEntryInput } from './entry.schema.js';
+import type { CreateEntryInput, UpdateEntryInput, ListEntriesQuery } from './entry.schema.js';
 
 class EntryService {
   async create(data: CreateEntryInput, userId: string) {
@@ -112,6 +112,34 @@ class EntryService {
   async deleteEntry(entryId: string, userId: string) {
     await this.getEntry(entryId, userId);
     await entryRepository.delete(entryId);
+  }
+
+  async listEntries(userId: string, query: ListEntriesQuery) {
+    const parsedTagIds = query.tagIds
+      ? query.tagIds.split(',').filter(Boolean)
+      : undefined;
+
+    const result = await entryRepository.findAll({
+      userId,
+      page: query.page,
+      limit: query.limit,
+      sortBy: query.sortBy,
+      sortDir: query.sortDir,
+      dateFrom: query.dateFrom,
+      dateTo: query.dateTo,
+      tagIds: parsedTagIds,
+      search: query.search,
+    });
+
+    return {
+      items: result.entries,
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / query.limit),
+      },
+    };
   }
 }
 

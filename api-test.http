@@ -199,7 +199,7 @@ GET {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000
 ### Get Entry — invalid entryId format (not a UUID)
 GET {{baseUrl}}/entries/not-a-uuid
 
-### Update Entry — success (replace with actual entry ID)
+### NOTE: Update Entry — success (replace with actual entry ID)
 PATCH {{baseUrl}}/entries/replace-with-actual-entry-uuid
 Content-Type: application/json
 
@@ -223,3 +223,42 @@ Content-Type: application/json
 {
   "title": "Ghost Entry"
 }
+
+### NOTE: Delete Entry — success (run after creating an entry, replace UUID)
+DELETE {{baseUrl}}/entries/replace-with-actual-entry-uuid
+
+### Delete Entry — not found (valid UUID, no entry)
+DELETE {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000
+
+### Delete Entry — invalid entryId format (not a UUID)
+DELETE {{baseUrl}}/entries/not-a-uuid
+
+### Delete Entry — unauthenticated (no session cookie)
+DELETE {{baseUrl}}/entries/00000000-0000-0000-0000-000000000001
+
+### NOTE: List Entries — success (basic, no filters)
+GET {{baseUrl}}/entries
+
+### List Entries — with pagination
+GET {{baseUrl}}/entries?page=1&limit=10
+
+### List Entries — with date range
+GET {{baseUrl}}/entries?dateFrom=2026-06-01&dateTo=2026-06-30
+
+### List Entries — with search
+GET {{baseUrl}}/entries?search=great
+
+### List Entries — sorted ascending by title
+GET {{baseUrl}}/entries?sortBy=title&sortDir=asc
+
+### List Entries — with tagIds filter
+GET {{baseUrl}}/entries?tagIds=replace-with-actual-tag-uuid
+
+### List Entries — unauthenticated (no session cookie)
+GET {{baseUrl}}/entries
+
+### List Entries — invalid sortBy value
+GET {{baseUrl}}/entries?sortBy=invalidColumn
+
+### List Entries — limit exceeds max (should clamp to 100)
+GET {{baseUrl}}/entries?limit=999

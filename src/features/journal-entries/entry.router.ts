@@ -1,13 +1,18 @@
 import { Router } from 'express';
 import { validate } from '../../shared/middlewares/validate.js';
 import { requireAuth } from '../../shared/middlewares/require-auth.js';
-import { createEntrySchema, updateEntrySchema, entryIdParamsSchema } from './entry.schema.js';
+import { createEntrySchema, updateEntrySchema, entryIdParamsSchema, listEntriesQuerySchema } from './entry.schema.js';
 import { entryController } from './entry.controller.js';
 
 export const entryRouter = Router();
 
 entryRouter.use(requireAuth);
 
+entryRouter.get(
+  '/',
+  validate(listEntriesQuerySchema, 'query'),
+  entryController.list,
+);
 entryRouter.post(
   '/',
   validate(createEntrySchema, 'body'),
