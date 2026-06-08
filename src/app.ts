@@ -1,5 +1,7 @@
 import express from 'express';
 import { requestLogger } from './shared/middlewares/request-logger.js';
+import { notFound } from './shared/errors/error.js';
+import { errorHandler } from './shared/middlewares/error-handler.js';
 
 export const app = express();
 
@@ -12,3 +14,6 @@ app.get('/health', (_req, res) => {
     message: 'OK',
   });
 });
+
+app.use(notFound);
+app.use(errorHandler);
