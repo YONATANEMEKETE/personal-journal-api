@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validate } from '../../shared/middlewares/validate.js';
 import { requireAuth } from '../../shared/middlewares/require-auth.js';
-import { createEntrySchema, entryIdParamsSchema } from './entry.schema.js';
+import { createEntrySchema, updateEntrySchema, entryIdParamsSchema } from './entry.schema.js';
 import { entryController } from './entry.controller.js';
 
 export const entryRouter = Router();
@@ -17,4 +17,10 @@ entryRouter.get(
   '/:entryId',
   validate(entryIdParamsSchema, 'params'),
   entryController.getEntry,
+);
+entryRouter.patch(
+  '/:entryId',
+  validate(entryIdParamsSchema, 'params'),
+  validate(updateEntrySchema, 'body'),
+  entryController.update,
 );

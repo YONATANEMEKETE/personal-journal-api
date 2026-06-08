@@ -16,6 +16,14 @@ class EntryRepository {
   async findById(id: string) {
     return prisma.journalEntry.findUnique({ where: { id } });
   }
+
+  async update(
+    id: string,
+    data: { title?: string; content?: string; entryDate?: Date },
+    tx: Prisma.TransactionClient,
+  ) {
+    return tx.journalEntry.update({ where: { id }, data });
+  }
 }
 
 export const entryRepository = new EntryRepository();

@@ -28,6 +28,20 @@ export class EntryController {
       next(error);
     }
   }
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const entryId = req.params.entryId as string;
+      const data = req.body;
+      const entry = await entryService.updateEntry(entryId, data, req.user!.id);
+
+      req.log.info({ entryId: entry.id }, 'entry updated');
+
+      sendSuccessResponse(res, 200, entry);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const entryController = new EntryController();

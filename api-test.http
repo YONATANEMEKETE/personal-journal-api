@@ -198,3 +198,28 @@ GET {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000
 
 ### Get Entry — invalid entryId format (not a UUID)
 GET {{baseUrl}}/entries/not-a-uuid
+
+### Update Entry — success (replace with actual entry ID)
+PATCH {{baseUrl}}/entries/replace-with-actual-entry-uuid
+Content-Type: application/json
+
+{
+  "title": "Updated Title",
+  "content": "Updated content."
+}
+
+### Update Entry — empty title
+PATCH {{baseUrl}}/entries/replace-with-actual-entry-uuid
+Content-Type: application/json
+
+{
+  "title": ""
+}
+
+### Update Entry — not found
+PATCH {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "title": "Ghost Entry"
+}
