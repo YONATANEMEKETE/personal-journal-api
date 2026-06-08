@@ -42,6 +42,11 @@ class TagsService {
 
     return tagsRepository.update(tagId, data);
   }
+
+  async deleteTag(tagId: string, userId: string) {
+    await this.getTag(tagId, userId);
+    await tagsRepository.delete(tagId);
+  }
 }
 
 export const tagsService = new TagsService();

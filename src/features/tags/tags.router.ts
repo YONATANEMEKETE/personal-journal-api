@@ -11,4 +11,5 @@ tagsRouter.use(requireAuth);
 tagsRouter.get('/', validate(listTagsQuerySchema, 'query'), tagsController.list);
 tagsRouter.get('/:tagId', validate(tagIdParamsSchema, 'params'), tagsController.getTag);
 tagsRouter.patch('/:tagId', validate(tagIdParamsSchema, 'params'), validate(updateTagSchema, 'body'), tagsController.update);
+tagsRouter.delete('/:tagId', validate(tagIdParamsSchema, 'params'), tagsController.delete);
 tagsRouter.post('/', validate(createTagSchema, 'body'), tagsController.create);

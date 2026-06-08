@@ -372,3 +372,15 @@ Content-Type: application/json
 {
   "color": "INVALID"
 }
+
+### Delete Tag — success (replace with actual tag UUID, run login first)
+DELETE {{baseUrl}}/tags/replace-with-actual-tag-uuid
+
+### Delete Tag — not found (valid UUID, no tag)
+DELETE {{baseUrl}}/tags/00000000-0000-0000-0000-000000000000
+
+### Delete Tag — invalid tagId format (not a UUID)
+DELETE {{baseUrl}}/tags/not-a-uuid
+
+### Delete Tag — unauthenticated (no session cookie)
+DELETE {{baseUrl}}/tags/00000000-0000-0000-0000-000000000000

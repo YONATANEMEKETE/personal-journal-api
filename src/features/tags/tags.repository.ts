@@ -26,6 +26,10 @@ class TagsRepository {
   async update(id: string, data: { name?: string; color?: $Enums.TagColor | null }) {
     return prisma.tag.update({ where: { id }, data });
   }
+
+  async delete(id: string) {
+    return prisma.tag.delete({ where: { id } });
+  }
 }
 
 export const tagsRepository = new TagsRepository();

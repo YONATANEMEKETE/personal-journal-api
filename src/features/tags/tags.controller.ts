@@ -55,6 +55,19 @@ export class TagsController {
       next(error);
     }
   }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tagId = req.params.tagId as string;
+      await tagsService.deleteTag(tagId, req.user!.id);
+
+      req.log.info({ tagId }, 'tag deleted');
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const tagsController = new TagsController();
