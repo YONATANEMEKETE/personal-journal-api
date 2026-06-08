@@ -3,6 +3,7 @@ import { validate } from '../../shared/middlewares/validate.js';
 import { requireAuth } from '../../shared/middlewares/require-auth.js';
 import { createEntrySchema, updateEntrySchema, entryIdParamsSchema, listEntriesQuerySchema } from './entry.schema.js';
 import { entryController } from './entry.controller.js';
+import { entryTagRouter } from '../entry-tags/entrytag.router.js';
 
 export const entryRouter = Router();
 
@@ -34,3 +35,5 @@ entryRouter.delete(
   validate(entryIdParamsSchema, 'params'),
   entryController.delete,
 );
+
+entryRouter.use('/:entryId/tags', entryTagRouter);

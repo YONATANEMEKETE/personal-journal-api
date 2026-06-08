@@ -384,3 +384,41 @@ DELETE {{baseUrl}}/tags/not-a-uuid
 
 ### Delete Tag — unauthenticated (no session cookie)
 DELETE {{baseUrl}}/tags/00000000-0000-0000-0000-000000000000
+
+### Assign Tags to Entry — success (replace with actual entry UUID and tag UUIDs, run login first)
+POST {{baseUrl}}/entries/replace-with-actual-entry-uuid/tags
+Content-Type: application/json
+
+{
+  "tagIds": ["replace-with-actual-tag-uuid-1", "replace-with-actual-tag-uuid-2"]
+}
+
+### Assign Tags — entry not found
+POST {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000/tags
+Content-Type: application/json
+
+{
+  "tagIds": ["00000000-0000-0000-0000-000000000000"]
+}
+
+### Assign Tags — missing tagIds field
+POST {{baseUrl}}/entries/replace-with-actual-entry-uuid/tags
+Content-Type: application/json
+
+{}
+
+### Assign Tags — empty tagIds array
+POST {{baseUrl}}/entries/replace-with-actual-entry-uuid/tags
+Content-Type: application/json
+
+{
+  "tagIds": []
+}
+
+### Assign Tags — invalid UUID in tagIds
+POST {{baseUrl}}/entries/replace-with-actual-entry-uuid/tags
+Content-Type: application/json
+
+{
+  "tagIds": ["not-a-uuid"]
+}
