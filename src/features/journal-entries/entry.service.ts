@@ -108,6 +108,11 @@ class EntryService {
       entryRepository.update(entryId, updateData, tx),
     );
   }
+
+  async deleteEntry(entryId: string, userId: string) {
+    await this.getEntry(entryId, userId);
+    await entryRepository.delete(entryId);
+  }
 }
 
 export const entryService = new EntryService();

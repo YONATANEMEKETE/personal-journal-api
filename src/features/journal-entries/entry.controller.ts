@@ -42,6 +42,19 @@ export class EntryController {
       next(error);
     }
   }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const entryId = req.params.entryId as string;
+      await entryService.deleteEntry(entryId, req.user!.id);
+
+      req.log.info({ entryId }, 'entry deleted');
+
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const entryController = new EntryController();

@@ -24,3 +24,8 @@ entryRouter.patch(
   validate(updateEntrySchema, 'body'),
   entryController.update,
 );
+entryRouter.delete(
+  '/:entryId',
+  validate(entryIdParamsSchema, 'params'),
+  entryController.delete,
+);

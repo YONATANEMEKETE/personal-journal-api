@@ -24,6 +24,10 @@ class EntryRepository {
   ) {
     return tx.journalEntry.update({ where: { id }, data });
   }
+
+  async delete(id: string) {
+    return prisma.journalEntry.delete({ where: { id } });
+  }
 }
 
 export const entryRepository = new EntryRepository();
