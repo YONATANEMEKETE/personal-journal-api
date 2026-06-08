@@ -88,8 +88,8 @@
 			"typeName": "user"
 		},
 		{
-			"x": 256.9366432472511,
-			"y": 55.90778476924165,
+			"x": 256.58113230010605,
+			"y": -150.84783601104405,
 			"z": 0.81,
 			"meta": {},
 			"id": "camera:page:page",
@@ -163,7 +163,7 @@
 			"isFocused": true,
 			"devicePixelRatio": 0.8680555820465088,
 			"isCoarsePointer": false,
-			"isHoveringCanvas": false,
+			"isHoveringCanvas": true,
 			"openMenus": [],
 			"isChangingStyle": false,
 			"isReadonly": false,
@@ -362,6 +362,18 @@
 								{
 									"type": "text",
 									"text": "ing, parsing, security headers, cors headers, rate limiting. mdlwrs."
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "  5.1 handle consistent error and success response shape util"
 								}
 							]
 						},
