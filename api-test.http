@@ -319,3 +319,15 @@ GET {{baseUrl}}/tags?includeEntryCount=true
 
 ### List Tags — unauthenticated (no session cookie)
 GET {{baseUrl}}/tags
+
+### Get Tag — success (replace with actual tag UUID, run login first)
+GET {{baseUrl}}/tags/replace-with-actual-tag-uuid
+
+### Get Tag — not found (valid UUID, no tag)
+GET {{baseUrl}}/tags/00000000-0000-0000-0000-000000000000
+
+### Get Tag — invalid tagId format (not a UUID)
+GET {{baseUrl}}/tags/not-a-uuid
+
+### Get Tag — unauthenticated (no session cookie)
+GET {{baseUrl}}/tags/00000000-0000-0000-0000-000000000000

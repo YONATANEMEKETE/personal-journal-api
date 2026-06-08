@@ -28,6 +28,19 @@ export class TagsController {
       next(error);
     }
   }
+
+  async getTag(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tagId = req.params.tagId as string;
+      const tag = await tagsService.getTag(tagId, req.user!.id);
+
+      req.log.info({ tagId: tag.id }, 'tag retrieved');
+
+      sendSuccessResponse(res, 200, tag);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const tagsController = new TagsController();

@@ -10,5 +10,10 @@ export const listTagsQuerySchema = z.object({
   includeEntryCount: z.coerce.boolean().optional().default(false),
 });
 
+export const tagIdParamsSchema = z.object({
+  tagId: z.string().uuid('Invalid tag ID'),
+});
+
 export type CreateTagInput = z.infer<typeof createTagSchema>;
 export type ListTagsQuery = z.infer<typeof listTagsQuerySchema>;
+export type TagIdParams = z.infer<typeof tagIdParamsSchema>;
