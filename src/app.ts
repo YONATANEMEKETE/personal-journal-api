@@ -12,12 +12,19 @@ import { authRouter } from './features/auth/auth.router.js';
 import { entryRouter } from './features/journal-entries/entry.router.js';
 import { tagsRouter } from './features/tags/tags.router.js';
 import { notFoundHandler } from './shared/middlewares/not-found.js';
+//
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import path from 'path';
+
+const swaggerDocument = YAML.load(path.join(process.cwd(), 'openapi.yaml'));
 
 const PgSession = connectPgSimple(session);
 
 export const app = express();
 
 // NOTE: Middlewares
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(requestLogger);
 app.use(express.json());
 app.use(helmet());
