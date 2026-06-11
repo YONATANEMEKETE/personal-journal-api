@@ -1,0 +1,956 @@
+openapi: 3.1.0
+info:
+  title: Personal Journal API
+  version: 1.0.0
+  description: |
+    OpenAPI contract for the Personal Journal API. The app uses cookie-based
+    session auth, JSON request bodies, and a consistent success envelope:
+    `{ "data": ... }` or `{ "data": { "items": [...], "meta": ... } }`.
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Health
+  - name: Auth
+  - name: Entries
+  - name: Tags
+  - name: Entry Tags
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Returns a minimal liveness response.
+      security: []
+      responses:
+        "200":
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a user
+      description: |
+        Creates a new user, hashes the password, and starts a session.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+            examples:
+              default:
+                value:
+                  name: Alice
+                  email: alice@example.com
+                  password: password123
+      responses:
+        "201":
+          description: User created and session established
+          headers:
+            Set-Cookie:
+              description: Session cookie set by the server.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in a user
+      description: |
+        Verifies email and password, then starts a session.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            examples:
+              default:
+                value:
+                  email: alice@example.com
+                  password: password123
+      responses:
+        "200":
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: Session cookie set by the server.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Log out the current user
+      description: |
+        Destroys the current session and clears the session cookie.
+      security:
+        - sessionAuth: []
+      responses:
+        "204":
+          description: Logged out successfully
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get the current user
+      description: Returns the authenticated user from the session.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserEnvelope"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /entries:
+    get:
+      tags: [Entries]
+      summary: List journal entries
+      description: |
+        Returns the authenticated user's entries with pagination, filtering,
+        and sorting support.
+      security:
+        - sessionAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/SortByEntry"
+        - $ref: "#/components/parameters/SortDir"
+        - $ref: "#/components/parameters/DateFrom"
+        - $ref: "#/components/parameters/DateTo"
+        - name: tagIds
+          in: query
+          required: false
+          description: Comma-separated tag UUIDs used to filter entries.
+          schema:
+            type: string
+          example: "11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222"
+        - name: search
+          in: query
+          required: false
+          description: Free-text search over title and content.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated list of entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntriesListEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      tags: [Entries]
+      summary: Create a journal entry
+      description: |
+        Creates a new entry for the authenticated user. Title must be unique per
+        user. Optional tag IDs must also belong to the user.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntryCreateRequest"
+            examples:
+              default:
+                value:
+                  title: My second entry
+                  content: Today was a good day.
+                  entryDate: "2026-06-08"
+                  tagIds:
+                    - 11111111-1111-1111-1111-111111111111
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntryEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+
+  /entries/{entryId}:
+    parameters:
+      - $ref: "#/components/parameters/EntryId"
+    get:
+      tags: [Entries]
+      summary: Get one journal entry
+      description: Returns one entry owned by the authenticated user.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: Entry found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntryEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    patch:
+      tags: [Entries]
+      summary: Update a journal entry
+      description: |
+        Updates fields on an entry owned by the authenticated user. If tagIds is
+        provided, the entry's tags are replaced.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntryUpdateRequest"
+            examples:
+              titleOnly:
+                value:
+                  title: Updated title
+      responses:
+        "200":
+          description: Entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntryEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+    delete:
+      tags: [Entries]
+      summary: Delete a journal entry
+      description: Deletes an entry owned by the authenticated user.
+      security:
+        - sessionAuth: []
+      responses:
+        "204":
+          description: Entry deleted
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /entries/{entryId}/tags:
+    parameters:
+      - $ref: "#/components/parameters/EntryId"
+    post:
+      tags: [Entry Tags]
+      summary: Assign tags to an entry
+      description: Replaces or adds tags on the entry for the authenticated user.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignTagsRequest"
+            examples:
+              default:
+                value:
+                  tagIds:
+                    - 11111111-1111-1111-1111-111111111111
+                    - 22222222-2222-2222-2222-222222222222
+      responses:
+        "200":
+          description: Entry with assigned tags
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntryWithTagsEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /entries/{entryId}/tags/{tagId}:
+    parameters:
+      - $ref: "#/components/parameters/EntryId"
+      - $ref: "#/components/parameters/TagId"
+    delete:
+      tags: [Entry Tags]
+      summary: Remove a tag from an entry
+      description: Removes one assigned tag from one entry.
+      security:
+        - sessionAuth: []
+      responses:
+        "204":
+          description: Tag removed from entry
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+  /tags:
+    get:
+      tags: [Tags]
+      summary: List tags
+      description: Returns the authenticated user's tags.
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: includeEntryCount
+          in: query
+          required: false
+          description: Include the number of entries attached to each tag.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Tag list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagsEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      tags: [Tags]
+      summary: Create a tag
+      description: Creates a new tag for the authenticated user.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagCreateRequest"
+            examples:
+              default:
+                value:
+                  name: productive
+                  color: AMBER
+      responses:
+        "201":
+          description: Tag created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+
+  /tags/{tagId}:
+    parameters:
+      - $ref: "#/components/parameters/TagId"
+    get:
+      tags: [Tags]
+      summary: Get one tag
+      description: Returns one tag owned by the authenticated user.
+      security:
+        - sessionAuth: []
+      responses:
+        "200":
+          description: Tag found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    patch:
+      tags: [Tags]
+      summary: Update a tag
+      description: Updates the name or color of one tag.
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TagUpdateRequest"
+            examples:
+              renameOnly:
+                value:
+                  name: journal
+      responses:
+        "200":
+          description: Tag updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagEnvelope"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+    delete:
+      tags: [Tags]
+      summary: Delete a tag
+      description: Deletes one tag owned by the authenticated user.
+      security:
+        - sessionAuth: []
+      responses:
+        "204":
+          description: Tag deleted
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: connect.sid
+
+  parameters:
+    EntryId:
+      name: entryId
+      in: path
+      required: true
+      description: Entry UUID.
+      schema:
+        type: string
+        format: uuid
+    TagId:
+      name: tagId
+      in: path
+      required: true
+      description: Tag UUID.
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      required: false
+      description: Page number starting at 1.
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of entries per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    SortByEntry:
+      name: sortBy
+      in: query
+      required: false
+      description: Entry field used for sorting.
+      schema:
+        type: string
+        enum: [entryDate, createdAt, updatedAt, title]
+        default: entryDate
+    SortDir:
+      name: sortDir
+      in: query
+      required: false
+      description: Sort direction.
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+    DateFrom:
+      name: dateFrom
+      in: query
+      required: false
+      description: Lower bound for entryDate filtering.
+      schema:
+        type: string
+        format: date
+    DateTo:
+      name: dateTo
+      in: query
+      required: false
+      description: Upper bound for entryDate filtering.
+      schema:
+        type: string
+        format: date
+
+  responses:
+    ValidationError:
+      description: Request validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    UnauthorizedError:
+      description: Authentication is required or invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    ForbiddenError:
+      description: Authenticated but not allowed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    ConflictError:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [message]
+      additionalProperties: false
+      properties:
+        message:
+          type: string
+          example: OK
+
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      additionalProperties: false
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          additionalProperties: false
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - UNAUTHORIZED
+                - FORBIDDEN
+                - NOT_FOUND
+                - CONFLICT
+                - INTERNAL_SERVER_ERROR
+            message:
+              type: string
+            details:
+              description: Extra error detail. Validation errors return an array of field issues.
+              oneOf:
+                - type: array
+                  items:
+                    $ref: "#/components/schemas/ValidationIssue"
+                - type: object
+                  additionalProperties: true
+                - type: string
+
+    ValidationIssue:
+      type: object
+      required: [field, message]
+      additionalProperties: false
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+
+    User:
+      type: object
+      required: [id, name, email, createdAt, updatedAt]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserEnvelope:
+      type: object
+      required: [data]
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/User"
+
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Display name for the user.
+        email:
+          type: string
+          format: email
+          description: Email address used for login.
+        password:
+          type: string
+          minLength: 8
+          description: Plain-text password sent only during register and login.
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 1
+
+    JournalEntry:
+      type: object
+      required: [id, userId, title, content, entryDate, createdAt, updatedAt]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        content:
+          type: string
+        entryDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    EntryEnvelope:
+      type: object
+      required: [data]
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/JournalEntry"
+
+    EntryTag:
+      type: object
+      required: [entryId, tagId, tag]
+      additionalProperties: false
+      properties:
+        entryId:
+          type: string
+          format: uuid
+        tagId:
+          type: string
+          format: uuid
+        tag:
+          $ref: "#/components/schemas/Tag"
+
+    JournalEntryWithTags:
+      type: object
+      required: [id, userId, title, content, entryDate, createdAt, updatedAt, entryTags]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        content:
+          type: string
+        entryDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        entryTags:
+          type: array
+          items:
+            $ref: "#/components/schemas/EntryTag"
+
+    EntryWithTagsEnvelope:
+      type: object
+      required: [data]
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/JournalEntryWithTags"
+
+    EntryCreateRequest:
+      type: object
+      required: [title, content, entryDate]
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+          minLength: 1
+          description: Entry title. Must be unique per user.
+        content:
+          type: string
+          minLength: 1
+          description: Entry body content.
+        entryDate:
+          type: string
+          format: date
+          description: Date the entry is about.
+        tagIds:
+          type: array
+          description: Optional tag UUIDs to attach at creation time.
+          items:
+            type: string
+            format: uuid
+
+    EntryUpdateRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        title:
+          type: string
+          minLength: 1
+          description: New title. Must remain unique per user.
+        content:
+          type: string
+          minLength: 1
+          description: New content.
+        entryDate:
+          type: string
+          format: date
+          description: New entry date.
+        tagIds:
+          type: array
+          description: Replaces the entry's tags when provided.
+          items:
+            type: string
+            format: uuid
+
+    PaginationMeta:
+      type: object
+      required: [page, limit, total, totalPages]
+      additionalProperties: false
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    EntriesListData:
+      type: object
+      required: [items, meta]
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/JournalEntry"
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+
+    EntriesListEnvelope:
+      type: object
+      required: [data]
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/EntriesListData"
+
+    TagColor:
+      type: string
+      enum:
+        - RED
+        - ORANGE
+        - AMBER
+        - YELLOW
+        - LIME
+        - GREEN
+        - EMERALD
+        - TEAL
+        - CYAN
+        - SKY
+        - BLUE
+        - INDIGO
+        - VIOLET
+        - PURPLE
+        - FUCHSIA
+        - PINK
+        - ROSE
+
+    TagCount:
+      type: object
+      required: [entryTags]
+      additionalProperties: false
+      properties:
+        entryTags:
+          type: integer
+
+    Tag:
+      type: object
+      required: [id, userId, name, createdAt]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        color:
+          oneOf:
+            - $ref: "#/components/schemas/TagColor"
+            - type: 'null'
+        createdAt:
+          type: string
+          format: date-time
+        _count:
+          description: Present when includeEntryCount=true is used.
+          $ref: "#/components/schemas/TagCount"
+
+    TagEnvelope:
+      type: object
+      required: [data]
+      additionalProperties: false
+      properties:
+        data:
+          $ref: "#/components/schemas/Tag"
+
+    TagsEnvelope:
+      type: object
+      required: [data]
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tag"
+
+    TagCreateRequest:
+      type: object
+      required: [name]
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Unique tag name for the current user.
+        color:
+          $ref: "#/components/schemas/TagColor"
+
+    TagUpdateRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: New tag name.
+        color:
+          $ref: "#/components/schemas/TagColor"
+
+    AssignTagsRequest:
+      type: object
+      required: [tagIds]
+      additionalProperties: false
+      properties:
+        tagIds:
+          type: array
+          minItems: 1
+          description: Tag UUIDs to attach to the entry.
+          items:
+            type: string
+            format: uuid
