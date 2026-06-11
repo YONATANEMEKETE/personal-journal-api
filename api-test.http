@@ -3,7 +3,7 @@
 ### Health check
 GET {{baseUrl}}/health
 
-### Register — success
+### NOTE: Register — success
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
@@ -73,8 +73,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "alice@example.com",
-  "password": "password123"
+  "email": "Charlie@Example.com",
+  "password": "securePass1"
 }
 
 ### Login — wrong password
@@ -82,7 +82,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "alice@example.com",
+  "email": "Charlie@Example.com",
   "password": "wrongpassword"
 }
 
@@ -118,25 +118,25 @@ Content-Type: application/json
 
 {}
 
-### Me — success (run login success first to establish session)
+### NOTE: Me — success (run login success first to establish session)
 GET {{baseUrl}}/auth/me
 
 ### Me — unauthenticated (no session cookie)
 GET {{baseUrl}}/auth/me
 
-### Logout — success (run login success first to establish session)
+### NOTE: Logout — success (run login success first to establish session)
 POST {{baseUrl}}/auth/logout
 
 ### Logout — unauthenticated (no session cookie, or after logout clears it)
 POST {{baseUrl}}/auth/logout
 
-### Create Entry — success (run login first to establish session)
+### NOTE: Create Entry — success (run login first to establish session)
 POST {{baseUrl}}/entries
 Content-Type: application/json
 
 {
-  "title": "My First Entry",
-  "content": "Today was a great day. I learned a lot about backend development.",
+  "title": "My second Entry",
+  "content": "Today was a good day. I learned a lot about backend development.",
   "entryDate": "2026-06-08"
 }
 
@@ -177,7 +177,7 @@ Content-Type: application/json
   "title": "Entry With Tags",
   "content": "This entry has mood tags attached.",
   "entryDate": "2026-06-08",
-  "tagIds": ["replace-with-actual-tag-uuid"]
+  "tagIds": ["a8e08bab-e45d-48dc-a2f8-861f17f618db"]
 }
 
 ### Create Entry — unauthenticated (no session cookie)
@@ -190,8 +190,8 @@ Content-Type: application/json
   "entryDate": "2026-06-08"
 }
 
-### Get Entry — success (replace with actual entry ID)
-GET {{baseUrl}}/entries/replace-with-actual-entry-uuid
+### NOTE: Get Entry — success (replace with actual entry ID)
+GET {{baseUrl}}/entries/abe2e6fd-ff2f-49d6-9cdd-9364e91ed954
 
 ### Get Entry — not found (valid UUID but no entry)
 GET {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000
@@ -200,7 +200,7 @@ GET {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000
 GET {{baseUrl}}/entries/not-a-uuid
 
 ### NOTE: Update Entry — success (replace with actual entry ID)
-PATCH {{baseUrl}}/entries/replace-with-actual-entry-uuid
+PATCH {{baseUrl}}/entries/abe2e6fd-ff2f-49d6-9cdd-9364e91ed954
 Content-Type: application/json
 
 {
@@ -225,7 +225,7 @@ Content-Type: application/json
 }
 
 ### NOTE: Delete Entry — success (run after creating an entry, replace UUID)
-DELETE {{baseUrl}}/entries/replace-with-actual-entry-uuid
+DELETE {{baseUrl}}/entries/abe2e6fd-ff2f-49d6-9cdd-9364e91ed954
 
 ### Delete Entry — not found (valid UUID, no entry)
 DELETE {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000
@@ -249,7 +249,7 @@ GET {{baseUrl}}/entries?dateFrom=2026-06-01&dateTo=2026-06-30
 GET {{baseUrl}}/entries?search=great
 
 ### List Entries — sorted ascending by title
-GET {{baseUrl}}/entries?sortBy=title&sortDir=asc
+GET {{baseUrl}}/entries?sortBy=title&sortDir=desc
 
 ### List Entries — with tagIds filter
 GET {{baseUrl}}/entries?tagIds=replace-with-actual-tag-uuid
@@ -263,12 +263,12 @@ GET {{baseUrl}}/entries?sortBy=invalidColumn
 ### List Entries — limit exceeds max (should clamp to 100)
 GET {{baseUrl}}/entries?limit=999
 
-### Create Tag — success (run login first to establish session)
+### NOTE: Create Tag — success (run login first to establish session)
 POST {{baseUrl}}/tags
 Content-Type: application/json
 
 {
-  "name": "grateful",
+  "name": "whooooaaah",
   "color": "AMBER"
 }
 
@@ -333,11 +333,11 @@ GET {{baseUrl}}/tags/not-a-uuid
 GET {{baseUrl}}/tags/00000000-0000-0000-0000-000000000000
 
 ### Update Tag — success (replace with actual tag UUID, run login first)
-PATCH {{baseUrl}}/tags/replace-with-actual-tag-uuid
+PATCH {{baseUrl}}/tags/9c8f9410-0ffd-42a5-ae02-c9752efad5c4
 Content-Type: application/json
 
 {
-  "name": "updated-tag-name",
+  "name": "not-greatful",
   "color": "BLUE"
 }
 
@@ -394,11 +394,11 @@ Content-Type: application/json
 }
 
 ### Assign Tags — entry not found
-POST {{baseUrl}}/entries/00000000-0000-0000-0000-000000000000/tags
+POST {{baseUrl}}/entries/535c8a45-9b2a-47d7-bb5d-f7671ad7da71/tags
 Content-Type: application/json
 
 {
-  "tagIds": ["00000000-0000-0000-0000-000000000000"]
+  "tagIds": ["a8e08bab-e45d-48dc-a2f8-861f17f618db", "a1674c16-25bf-4458-be95-79d8af672f51"]
 }
 
 ### Assign Tags — missing tagIds field
