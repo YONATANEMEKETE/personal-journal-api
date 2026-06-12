@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "db:check": "tsx src/shared/scripts/db-check.ts",
-    "db:seed": "tsx src/shared/scripts/seed.ts"
+    "db:seed": "tsx src/shared/scripts/seed.ts",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
