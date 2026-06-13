@@ -16,6 +16,9 @@ import { notFoundHandler } from './shared/middlewares/not-found.js';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
+import { metricsMiddleware } from './shared/middlewares/metrics.js';
+import { logger } from './shared/utils/logger.js';
+import { register } from './shared/utils/metrics.js';
 
 const swaggerDocument = YAML.load(path.join(process.cwd(), 'openapi.yaml'));
 
@@ -26,6 +29,7 @@ export const app = express();
 // NOTE: Middlewares
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(requestLogger);
+app.use(metricsMiddleware);
 app.use(express.json());
 app.use(helmet());
 app.use(
@@ -52,6 +56,45 @@ app.use(
   }),
 );
 app.use(deserializeUser);
+
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+  });
+  logger.info({ event: 'server_healthy' }, 'Server is healthy');
+});
+
+app.get('/ready', (req, res) => {
+  if (req.app.locals.isShuttingDown) {
+    logger.info(
+      { event: 'server_not_ready' },
+      'Server is shutting down, and not accepting HTTP requests',
+    );
+    return res.status(503).json({
+      status: 'error',
+      code: 'SERVICE_UNAVAILABLE',
+      message: 'Server is shutting down',
+    });
+  }
+  res.status(200).json({
+    status: 'ready',
+  });
+  logger.info(
+    { event: 'server_ready' },
+    'Server is ready, and accepting HTTP requests',
+  );
+});
+
+// NOTE: Prometheus Metrics Endpoint
+app.get('/metrics', async (_req, res) => {
+  try {
+    res.setHeader('Content-Type', register.contentType);
+    res.send(await register.metrics());
+  } catch (err) {
+    logger.error('Error generating metrics: %s', err);
+    res.status(500).send(err);
+  }
+});
 
 // NOTE: Routes
 app.use('/auth', authRouter);

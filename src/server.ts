@@ -3,37 +3,7 @@ import { configs } from './shared/configs/env.js';
 import { prisma } from './shared/db/prisma.js';
 import { logger } from './shared/utils/logger.js';
 
-let isShuttingDown = false;
-
-// TODO: add startup validation like db-check, other required checks before server starts
-
-app.get('/health', (_req, res) => {
-  res.status(200).json({
-    status: 'ok',
-  });
-  logger.info({ event: 'server_healthy' }, 'Server is healthy');
-});
-
-app.get('/ready', (_req, res) => {
-  if (isShuttingDown) {
-    logger.info(
-      { event: 'server_not_ready' },
-      'Server is shutting down, and not accepting HTTP requests',
-    );
-    return res.status(503).json({
-      status: 'error',
-      code: 'SERVICE_UNAVAILABLE',
-      message: 'Server is shutting down',
-    });
-  }
-  res.status(200).json({
-    status: 'ok',
-  });
-  logger.info(
-    { event: 'server_ready' },
-    'Server is ready, and accepting HTTP requests',
-  );
-});
+app.locals.isShuttingDown = false;
 
 const server = app.listen(configs.PORT, () => {
   logger.info(
@@ -43,7 +13,7 @@ const server = app.listen(configs.PORT, () => {
 
 const gracefulShutdown = async () => {
   logger.info('Received kill signal, shutting down gracefully.');
-  isShuttingDown = true;
+  app.locals.isShuttingDown = true;
 
   logger.info('Closing HTTP server');
   server.close(async (err) => {
