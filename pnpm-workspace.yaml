@@ -7,3 +7,7 @@ allowBuilds:
   prisma: true
   protobufjs: true
   ssh2: true
+
+overrides:
+  esbuild: ^0.28.1
+  '@hono/node-server': ^1.19.13
