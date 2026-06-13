@@ -58,11 +58,5 @@ app.use('/auth', authRouter);
 app.use('/entries', entryRouter);
 app.use('/tags', tagsRouter);
 
-app.get('/health', (_req, res) => {
-  res.status(200).json({
-    message: 'OK',
-  });
-});
-
 app.use(notFoundHandler);
 app.use(errorHandler);

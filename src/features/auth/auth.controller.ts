@@ -40,6 +40,8 @@ export class AuthController {
         res.clearCookie('connect.sid');
         res.status(204).send();
       });
+
+      req.log.info({ userId: req.user?.id }, 'user logged out');
     } catch (error) {
       next(error);
     }
@@ -47,6 +49,7 @@ export class AuthController {
 
   async me(req: Request, res: Response, next: NextFunction) {
     try {
+      req.log.info({ userId: req.user?.id }, 'user fetched');
       sendSuccessResponse(res, 200, req.user!);
     } catch (error) {
       next(error);

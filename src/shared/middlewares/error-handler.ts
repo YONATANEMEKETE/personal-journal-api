@@ -9,17 +9,34 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
       field: issue.path.join('.'),
       message: issue.message,
     }));
-    req.log.warn({ err }, 'validation failed');
-    sendErrorResponse(res, 400, 'VALIDATION_ERROR', 'Invalid request data', details);
+    req.log.warn(
+      { err, event: 'validation_error' },
+      'Request validation failed',
+    );
+    sendErrorResponse(
+      res,
+      400,
+      'VALIDATION_ERROR',
+      'Invalid request data',
+      details,
+    );
     return;
   }
 
   if (isAppError(err)) {
-    req.log.error({ err }, 'request failed');
+    req.log.error(
+      { err, event: err.code.toLowerCase() },
+      'Request processing failed',
+    );
     sendErrorResponse(res, err.statusCode, err.code, err.message, err.details);
     return;
   }
 
-  req.log.error({ err }, 'unexpected error');
-  sendErrorResponse(res, 500, 'INTERNAL_SERVER_ERROR', 'An unexpected error occurred');
+  req.log.error({ err, event: 'unexpected_error' }, 'unexpected error');
+  sendErrorResponse(
+    res,
+    500,
+    'INTERNAL_SERVER_ERROR',
+    'An unexpected error occurred',
+  );
 };

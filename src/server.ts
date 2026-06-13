@@ -11,12 +11,15 @@ app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'ok',
   });
-  logger.info('Server is healthy, and accepting HTTP requests');
+  logger.info({ event: 'server_healthy' }, 'Server is healthy');
 });
 
 app.get('/ready', (_req, res) => {
   if (isShuttingDown) {
-    logger.info('Server is shutting down, and not accepting HTTP requests');
+    logger.info(
+      { event: 'server_not_ready' },
+      'Server is shutting down, and not accepting HTTP requests',
+    );
     return res.status(503).json({
       status: 'error',
       code: 'SERVICE_UNAVAILABLE',
@@ -26,7 +29,10 @@ app.get('/ready', (_req, res) => {
   res.status(200).json({
     status: 'ok',
   });
-  logger.info('Server is ready, and accepting HTTP requests');
+  logger.info(
+    { event: 'server_ready' },
+    'Server is ready, and accepting HTTP requests',
+  );
 });
 
 const server = app.listen(configs.PORT, () => {
